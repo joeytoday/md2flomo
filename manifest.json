@@ -3,7 +3,7 @@
 	"name": "md2flomo",
 	"version": "0.4.3",
 	"minAppVersion": "1.9.0",
-	"description": "将 Obsidian 中的 Markdown 文档导入到 flomo",
+	"description": "Import Markdown documents from Obsidian to flomo.",
 	"author": "joeytoday",
 	"authorUrl": "https://github.com/joeytoday",
 	"fundingUrl": "https://www.joeytoday.com/projects#sponsorship",
