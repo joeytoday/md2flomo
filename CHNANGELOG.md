@@ -6,8 +6,6 @@
 格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 版本控制遵循[语义化版本](https://semver.org/lang/zh-CN/).
 
-## [Unreleased]
-
 ## 0.4.3 - 2025-09-01
 ### Added
 - [x] 插件设置中支持配置 flomo API Token ✅ 2025-08-31
