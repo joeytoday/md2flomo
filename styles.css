@@ -1,0 +1,247 @@
+/* md2flomo 插件样式 */
+
+/* 模态框预览样式 */
+.md2flomo-preview {
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    padding: 12px;
+    margin: 12px 0;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* 按钮容器样式 */
+.md2flomo-button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.md2flomo-button-container button {
+    padding: 6px 16px;
+    border-radius: 4px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.md2flomo-button-container button:first-child {
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
+}
+
+.md2flomo-button-container button:first-child:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.md2flomo-button-container button:last-child {
+    background-color: var(--interactive-accent);
+    color: white;
+}
+
+.md2flomo-button-container button:last-child:hover {
+    background-color: var(--interactive-accent-hover);
+}
+
+/* 帮助文本样式 */
+.md2flomo-help {
+    margin-top: 24px;
+    padding: 16px;
+    background-color: var(--background-secondary);
+    border-radius: 4px;
+}
+
+.md2flomo-help h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: var(--text-title);
+}
+
+.md2flomo-help p {
+    margin: 6px 0;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* 发布中心样式 */
+.md2flomo-publication-center {
+    padding: 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.md2flomo-publication-center h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--text-title);
+}
+
+/* 分类区域样式 */
+.md2flomo-categories {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.md2flomo-category {
+    margin-bottom: 20px;
+}
+
+/* 分类标题样式 */
+.md2flomo-category-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: var(--background-secondary);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    transition: background-color 0.2s;
+}
+
+.md2flomo-category-header:hover {
+    background-color: var(--background-secondary-alt);
+}
+
+.md2flomo-category-toggle {
+    width: 20px;
+    text-align: center;
+    margin-right: 8px;
+    font-size: 12px;
+    line-height: 1;
+    transition: transform 0.2s;
+}
+
+.md2flomo-category h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.md2flomo-category-content {
+    padding-left: 20px;
+}
+
+/* 目录树样式 */
+.md2flomo-folder-item {
+    margin-bottom: 4px;
+}
+
+.md2flomo-folder-header {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    cursor: pointer;
+}
+
+.md2flomo-folder-header:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.md2flomo-folder-header input[type="checkbox"] {
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+.md2flomo-toggle-button {
+    margin-right: 6px;
+    font-size: 10px;
+    cursor: pointer;
+    width: 12px;
+    text-align: center;
+}
+
+.md2flomo-folder-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.md2flomo-folder-icon {
+    margin-right: 6px;
+}
+
+.md2flomo-folder-name {
+    color: var(--text-normal);
+}
+
+.md2flomo-folder-content {
+    padding-left: 20px;
+    margin-left: 20px;
+    border-left: 1px dashed var(--background-modifier-border);
+}
+
+.md2flomo-file-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.md2flomo-file-item:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.md2flomo-file-item input[type="checkbox"] {
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+.md2flomo-file-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.md2flomo-file-icon {
+    margin-right: 6px;
+}
+
+.md2flomo-file-name {
+    color: var(--text-normal);
+}
+
+.md2flomo-changed-icon {
+    margin-left: 8px;
+    color: var(--interactive-accent);
+}
+
+/* 发布按钮样式 */
+.md2flomo-publish-button {
+    background-color: var(--interactive-accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: background-color 0.2s ease;
+}
+
+.md2flomo-publish-button:hover {
+    background-color: var(--interactive-accent-hover);
+}
+
+.md2flomo-publish-button:active {
+    background-color: var(--interactive-accent-active);
+}
+
+/* 复选框占位元素 */
+.md2flomo-checkbox-placeholder {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
