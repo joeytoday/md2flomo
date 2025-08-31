@@ -34,19 +34,19 @@
 
 #### 未去除格式效果
 
-![](./assets/md2flomo-sendcard.mp4)
+![](./assets/md2flomo-sendcard.gif)
 
 #### 去除格式效果
 
-![](./assets/md2flomo-sendcard-clean.mp4)
+![](./assets/md2flomo-sendcard-clean.gif)
 
 #### 发布后台状态修复
 
-![](./assets/md2flomo-pub-status.mp4)
+![](./assets/md2flomo-pub-status.gif)
 
 #### 批量发布
 
-![](./assets/md2flomo-sendnotes.mp4)
+![](./assets/md2flomo-sendnotes.gif)
 
 ## 0.5.0 - 待发布
 ### Planned

@@ -64,19 +64,19 @@
 
 如果 `send-flomo` 状态为 `false`，点击发布后会确认内容，确认后此状态会更新为 `true`。
 
-![](./assets/md2flomo-sendstatus.mp4)
+![](./assets/md2flomo-sendstatus.gif)
 
 #### 去除格式效果
 
-![](./assets/md2flomo-sendcard-clean.mp4)
+![](./assets/md2flomo-sendcard-clean.gif)
 
 #### 发布后台状态修复
 
-![](./assets/md2flomo-pub-status.mp4)
+![](./assets/md2flomo-pub-status.gif)
 
 ### 批量发布
 
-![](./assets/md2flomo-sendnotes.mp4)
+![](./assets/md2flomo-sendnotes.gif)
 
 
 ---
