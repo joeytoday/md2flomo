@@ -108,6 +108,24 @@
     transition: background-color 0.2s;
 }
 
+/* 内容显示/隐藏状态类 */
+.md2flomo-content-hidden {
+    display: none;
+}
+
+.md2flomo-content-visible {
+    display: block;
+}
+
+/* 切换按钮状态类 */
+.md2flomo-toggle-collapsed::before {
+    content: '▶';
+}
+
+.md2flomo-toggle-expanded::before {
+    content: '▼';
+}
+
 .md2flomo-category-header:hover {
     background-color: var(--background-secondary-alt);
 }

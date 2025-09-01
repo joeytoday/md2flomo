@@ -148,15 +148,7 @@ async function sendToFlomo(content: string, apiUrl: string): Promise<boolean> {
         // 确保URL以斜杠结尾（参考flomo官方API格式）
         if (!normalizedApiUrl.endsWith('/') && !normalizedApiUrl.includes('?')) {
             normalizedApiUrl += '/';
-            console.log('规范化API URL，添加结尾斜杠:', normalizedApiUrl);
         }
-        
-        // 日志记录 - 增加更详细的信息
-        console.log('===== 开始发送到flomo =====');
-        console.log('API URL:', normalizedApiUrl);
-        console.log('发送内容长度:', content.length, '字符');
-        console.log('发送内容预览:', content.substring(0, 100) + (content.length > 100 ? '...' : ''));
-        console.log('完整内容:', content); // 添加完整内容日志，用于调试
         
         // 根据用户要求和curl测试结果，使用表单格式发送
         const formBody = new URLSearchParams();
@@ -171,8 +163,6 @@ async function sendToFlomo(content: string, apiUrl: string): Promise<boolean> {
         let finalStatusCode = 0;
         let requestBody = formBody.toString();
         
-        console.log('表单请求体:', requestBody);
-        
         try {
             const response = await fetch(normalizedApiUrl, {
                 method: 'POST',
@@ -184,15 +174,11 @@ async function sendToFlomo(content: string, apiUrl: string): Promise<boolean> {
             finalResponseText = await response.text();
             finalStatusCode = response.status;
             
-            console.log('响应状态:', finalStatusCode);
-            console.log('响应内容:', finalResponseText || '空响应');
-            
             // 使用替代方法记录响应头信息
             const headersObj: Record<string, string> = {};
             response.headers.forEach((value, key) => {
                 headersObj[key] = value;
             });
-            console.log('响应头:', JSON.stringify(headersObj));
             
             // 检查是否成功
             if (response.ok) {
@@ -200,38 +186,26 @@ async function sendToFlomo(content: string, apiUrl: string): Promise<boolean> {
                     // 尝试解析flomo返回的JSON响应
                     if (finalResponseText) {
                         const responseJson = JSON.parse(finalResponseText);
-                        console.log('解析响应JSON:', responseJson);
                         
                         // 检查flomo特定的成功标志
                         if (responseJson.code === 0) {
-                            console.log('发送请求成功，flomo返回code=0');
                             success = true;
                         } else {
-                            console.error('flomo返回错误状态码:', responseJson.code, '消息:', responseJson.message);
                             success = false;
                         }
                     } else {
-                        console.warn('响应内容为空，无法确认是否真正成功');
                         success = true; // 保留原有行为，仅依赖HTTP状态码
                     }
                 } catch (jsonError) {
-                    console.error('解析响应JSON失败:', jsonError);
                     // 如果JSON解析失败，我们只能依赖HTTP状态码
-                    console.log('发送请求成功（基于HTTP状态码）');
                     success = true;
                 }
             }
         } catch (error) {
-            console.error('发送请求发生异常:', error);
         }
         
         // 发送失败
         if (!success) {
-            console.error('===== 发送到flomo失败 =====');
-            console.error('详细错误信息: 状态码=' + finalStatusCode + ', 响应内容=' + finalResponseText);
-            console.error('调试信息: URL=' + normalizedApiUrl + ', 内容长度=' + content.length);
-            console.error('调试信息: 请求体=' + requestBody);
-            
             // 根据错误类型提供更具体的提示
             if (finalStatusCode === 200) {
                 new Notice(`发送到flomo失败: 服务器返回200但内容未同步，\n请确认API URL是否正确并包含完整token信息`);
@@ -246,11 +220,8 @@ async function sendToFlomo(content: string, apiUrl: string): Promise<boolean> {
         }
         
         // 发送成功
-        console.log('===== 发送请求成功，状态码:', finalStatusCode, '=====');
-        console.log('注意：即使状态码为200，也请检查flomo客户端确认内容是否实际同步成功');
         return true;
     } catch (error) {
-        console.error('发送到flomo时发生未处理的错误:', error);
         new Notice('发送到flomo时发生错误，请查看控制台日志');
         return false;
     }
@@ -302,9 +273,7 @@ class ImportConfirmModal extends Modal {
                         if (!sendFlomo) {
                             const updateSuccess = await updateSendFlomoStatus(this.app, this.file, true);
                             if (updateSuccess) {
-                                console.log('已更新文件的send-flomo属性为true');
                             } else {
-                                console.error('更新文件的send-flomo属性失败');
                             }
                         }
                         
@@ -710,8 +679,7 @@ class PublicationCenter extends Modal {
             folderInfo.createEl('span', { cls: 'md2flomo-folder-name', text: folderName });
             
             // 文件夹内容（默认折叠）
-            const folderContent = folderItem.createDiv({ cls: 'md2flomo-folder-content' });
-            folderContent.style.display = 'none';
+            const folderContent = folderItem.createDiv({ cls: 'md2flomo-folder-content md2flomo-content-hidden' });
             
             // 递归渲染子目录
             this.renderTreeLevel(folderNode, folderContent, category);
@@ -749,27 +717,27 @@ class PublicationCenter extends Modal {
         const header = section.createDiv({ cls: 'md2flomo-category-header' });
         
         // 添加折叠/展开按钮
-        const toggleButton = header.createEl('span', { cls: 'md2flomo-category-toggle', text: '▶' });
+        const toggleButton = header.createEl('span', { cls: 'md2flomo-category-toggle md2flomo-toggle-expanded' });
         
         // 添加标题文本
         header.createEl('h3', { text: title });
         
         // 创建内容容器
-        const contentContainer = section.createDiv({ cls: 'md2flomo-category-content' });
+        const contentContainer = section.createDiv({ cls: 'md2flomo-category-content md2flomo-content-visible' });
         contentContainer.setAttr('data-category', type);
-        
-        // 默认展开内容
-        contentContainer.style.display = 'block';
-        toggleButton.textContent = '▼';
         
         // 添加点击事件以折叠/展开内容
         header.addEventListener('click', () => {
-            if (contentContainer.style.display === 'block') {
-                contentContainer.style.display = 'none';
-                toggleButton.textContent = '▶';
+            if (contentContainer.classList.contains('md2flomo-content-visible')) {
+                contentContainer.classList.remove('md2flomo-content-visible');
+                contentContainer.classList.add('md2flomo-content-hidden');
+                toggleButton.classList.remove('md2flomo-toggle-expanded');
+                toggleButton.classList.add('md2flomo-toggle-collapsed');
             } else {
-                contentContainer.style.display = 'block';
-                toggleButton.textContent = '▼';
+                contentContainer.classList.remove('md2flomo-content-hidden');
+                contentContainer.classList.add('md2flomo-content-visible');
+                toggleButton.classList.remove('md2flomo-toggle-collapsed');
+                toggleButton.classList.add('md2flomo-toggle-expanded');
             }
         });
     }
@@ -908,7 +876,6 @@ class Md2FlomoSettingTab extends PluginSettingTab {
                 .onClick(async () => {
                     const testContent = `**测试笔记**\n\n这是一条通过md2flomo插件发送的测试笔记。\n\n标签：#测试 #md2flomo`;
                     new Notice('正在发送测试内容到flomo...');
-                    console.log('开始发送测试内容到flomo');
                     const success = await sendToFlomo(testContent, this.plugin.settings.flomoApiUrl);
                     if (success) {
                         new Notice('测试内容发送成功，请检查flomo是否收到');
