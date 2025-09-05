@@ -1,8 +1,8 @@
 {
 	"id": "md2flomo",
 	"name": "md2flomo",
-	"version": "0.4.3",
-	"minAppVersion": "1.9.12",
+	"version": "0.5.2",
+	"minAppVersion": "0.5.0",
 	"description": "Send Markdown documents to flomo.",
 	"author": "joeytoday",
 	"authorUrl": "https://github.com/joeytoday",
