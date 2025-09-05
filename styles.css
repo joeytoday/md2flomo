@@ -263,3 +263,47 @@
     margin-right: 8px;
     vertical-align: middle;
 }
+
+/* Block内容容器样式 */
+.md2flomo-blocks-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 12px 0;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    padding: 8px;
+    background-color: var(--background-secondary);
+}
+
+/* Block项样式 */
+.md2flomo-block-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: var(--background-primary);
+    border-radius: 4px;
+    border: 1px solid var(--background-modifier-border);
+    transition: all 0.2s ease;
+}
+
+.md2flomo-block-item:hover {
+    background-color: var(--background-secondary-alt);
+    border-color: var(--interactive-accent);
+}
+
+/* Block内容样式 */
+.md2flomo-block-content {
+    flex: 1;
+    margin-left: 8px;
+    font-size: 14px;
+    color: var(--text-normal);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* 复选框样式 */
+.md2flomo-block-item input[type="checkbox"] {
+    margin-top: 2px;
+    cursor: pointer;
+}

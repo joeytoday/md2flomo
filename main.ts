@@ -10,7 +10,7 @@ interface Md2FlomoSettings {
 
 // 默认设置
 const DEFAULT_SETTINGS: Md2FlomoSettings = {
-    flomoApiUrl: 'https://flomoapp.com/iwh/MzU3NzU5/2d682816a59a2aed91ac26e06dc17298/',
+    flomoApiUrl: '', // 不使用真实默认的API，从配置页面获取
     publishedNotes: {}, // 用于存储已发布笔记的信息
     hasShownApiReminder: false
 };
@@ -249,7 +249,7 @@ class ImportConfirmModal extends Modal {
         contentEl.createEl('h2', { text: '确认导入到flomo' });
         contentEl.createEl('p', { text: '以下内容将被导入到flomo:' });
         
-        const preview = contentEl.createEl('div', { cls: 'md2flomo-preview' });
+        const preview = contentEl.createDiv({ cls: 'md2flomo-preview' });
         preview.setText(this.content.substring(0, 200) + (this.content.length > 200 ? '...' : ''));
         
         const buttonContainer = contentEl.createDiv({ cls: 'md2flomo-button-container' });
@@ -298,26 +298,150 @@ class ImportConfirmModal extends Modal {
     }
 }
 
+// Block内容导入确认模态框
+class BlockImportConfirmModal extends Modal {
+    private blocks: string[];
+    private apiUrl: string;
+    private file: TFile | null;
+    private plugin: Md2FlomoPlugin;
+    private selectedBlocks: number[] = [];
+
+    constructor(app: App, blocks: string[], apiUrl: string, plugin: Md2FlomoPlugin, file?: TFile) {
+        super(app);
+        this.blocks = blocks;
+        this.apiUrl = apiUrl;
+        this.file = file || null;
+        this.plugin = plugin;
+        // 默认选中所有block
+        this.selectedBlocks = Array.from({ length: blocks.length }, (_, i) => i);
+    }
+
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.empty();
+        
+        contentEl.createEl('h2', { text: '确认导入到flomo' });
+        contentEl.createEl('p', { text: '内容已按双换行符分割，您可以选择要导入的部分:' });
+        
+        const blocksContainer = contentEl.createDiv({ cls: 'md2flomo-blocks-container' });
+        
+        // 创建所有block的选择项
+        this.blocks.forEach((block, index) => {
+            const blockItem = blocksContainer.createEl('div', { cls: 'md2flomo-block-item' });
+            
+            // 添加复选框
+            const checkbox = blockItem.createEl('input', { type: 'checkbox' });
+            checkbox.checked = this.selectedBlocks.includes(index);
+            checkbox.addEventListener('change', (event) => {
+                const isChecked = (event.target as HTMLInputElement).checked;
+                if (isChecked) {
+                    if (!this.selectedBlocks.includes(index)) {
+                        this.selectedBlocks.push(index);
+                    }
+                } else {
+                    this.selectedBlocks = this.selectedBlocks.filter(i => i !== index);
+                }
+            });
+            
+            // 添加block内容预览
+            const blockContent = blockItem.createEl('div', { cls: 'md2flomo-block-content' });
+            blockContent.setText(block);
+        });
+        
+        const buttonContainer = contentEl.createDiv({ cls: 'md2flomo-button-container' });
+        
+        const cancelButton = buttonContainer.createEl('button', { text: 'Cancel' });
+        cancelButton.onclick = () => this.close();
+        
+        const selectAllButton = buttonContainer.createEl('button', { text: 'Select All' });
+        selectAllButton.onclick = () => {
+            this.selectedBlocks = Array.from({ length: this.blocks.length }, (_, i) => i);
+            const checkboxes = contentEl.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                (checkbox as HTMLInputElement).checked = true;
+            });
+        };
+        
+        const publishButton = buttonContainer.createEl('button', { text: 'Publish' });
+        publishButton.onclick = async () => {
+            if (this.selectedBlocks.length === 0) {
+                new Notice('请先选择要发布的内容');
+                return;
+            }
+            
+            new Notice(`正在导入 ${this.selectedBlocks.length} 条内容到flomo...`);
+            
+            let successCount = 0;
+            for (const index of this.selectedBlocks) {
+                const block = this.blocks[index];
+                const success = await sendToFlomo(block, this.apiUrl);
+                if (success) {
+                    successCount++;
+                }
+            }
+            
+            if (successCount > 0) {
+                new Notice(`✅ 成功导入 ${successCount} 条内容！`);
+                
+                // 如果有文件对象，将send-flomo设置为true
+                if (this.file) {
+                    await updateSendFlomoStatus(this.app, this.file, true);
+                }
+            } else {
+                new Notice('❌ 导入失败，请检查API配置');
+            }
+            
+            this.close();
+        };
+    }
+
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
+    }
+}
+
 export default class Md2FlomoPlugin extends Plugin {
     settings: Md2FlomoSettings;
 
     async onload() {
         await this.loadSettings();
 
-        // 添加功能区图标
+        // 添加功能区图标 - 导入整个文件
         this.addRibbonIcon('paper-plane', '导入到flomo', async () => {
             await this.importCurrentNoteToFlomo();
         });
 
-        // 添加命令 - 导入当前笔记
+        // 添加功能区图标 - 导入block内容
+        this.addRibbonIcon('file-text', '导入block内容到flomo', async () => {
+            await this.importCurrentNoteBlocksToFlomo();
+        });
+
+        // 添加命令 - 文件内容发布
         this.addCommand({
             id: 'import-to-flomo',
-            name: '导入当前笔记到flomo',
+            name: '文件内容发布',
             checkCallback: (checking: boolean) => {
                 const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
                 if (markdownView) {
                     if (!checking) {
                         this.importCurrentNoteToFlomo();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        // 添加命令 - block内容发布
+        this.addCommand({
+            id: 'import-blocks-to-flomo',
+            name: 'block内容发布',
+            checkCallback: (checking: boolean) => {
+                const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+                if (markdownView) {
+                    if (!checking) {
+                        this.importCurrentNoteBlocksToFlomo();
                     }
                     return true;
                 }
@@ -371,6 +495,7 @@ export default class Md2FlomoPlugin extends Plugin {
         return hash.toString();
     }
 
+    // 导入当前笔记到flomo
     async importCurrentNoteToFlomo() {
         // 检查API URL配置
         if (!this.settings.flomoApiUrl) {
@@ -454,6 +579,70 @@ export default class Md2FlomoPlugin extends Plugin {
             }
         } catch (error) {
             console.error('导入到flomo时发生错误:', error);
+            new Notice('❌ 处理文件时发生错误');
+        }
+    }
+    
+    // 导入当前笔记的blocks到flomo
+    async importCurrentNoteBlocksToFlomo() {
+        // 检查API URL配置
+        if (!this.settings.flomoApiUrl) {
+            new Notice('❌ 请先在设置中配置您的 flomo API URL');
+            return;
+        }
+
+        // 获取当前活动的Markdown视图
+        const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (!markdownView) {
+            new Notice('❌ 请先打开一个Markdown文件');
+            return;
+        }
+
+        try {
+            // 检查文件是否存在
+            if (!markdownView.file) {
+                new Notice('❌ 无法访问当前文件');
+                return;
+            }
+            
+            // 获取文件内容
+            const fileContent = await this.app.vault.cachedRead(markdownView.file);
+            
+            // 提取tags
+            const { tags } = extractTagsFromFrontmatter(fileContent);
+            
+            // 移除frontmatter并处理内容
+            let cleanContent = removeFrontmatter(fileContent);
+            
+            // 移除Markdown格式（加粗、斜体等）
+            cleanContent = removeMarkdownFormatting(cleanContent);
+            
+            // 按双换行符分割内容为多个block
+            const rawBlocks = cleanContent.split(/\n\n+/);
+            
+            // 处理每个block，添加标签
+            const blocks: string[] = [];
+            for (let block of rawBlocks) {
+                block = block.trim();
+                if (block) {
+                    // 始终添加从frontmatter提取的标签到block内容末尾
+                    if (tags.length > 0) {
+                        const tagsText = tags.map(tag => `#${tag.replace(/\s+/g, '')}`).join(' ');
+                        block += '\n' + tagsText;
+                    }
+                    blocks.push(block);
+                }
+            }
+            
+            if (blocks.length === 0) {
+                new Notice('❌ 未找到可导入的内容块');
+                return;
+            }
+            
+            // 显示block导入确认模态框
+            new BlockImportConfirmModal(this.app, blocks, this.settings.flomoApiUrl, this, markdownView.file).open();
+        } catch (error) {
+            console.error('导入block到flomo时发生错误:', error);
             new Notice('❌ 处理文件时发生错误');
         }
     }

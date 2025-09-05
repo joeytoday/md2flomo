@@ -4,7 +4,7 @@
 # 这个脚本可以帮助你直接从终端测试 flomo API 连接是否正常
 
 # 默认 API URL (从插件默认设置中提取)
-DEFAULT_API_URL="https://flomoapp.com/iwh/MzU3NzU5/2d682816a59a2aed91ac26e06dc17298/"
+DEFAULT_API_URL=""
 
 # 提示用户输入 API URL 和 API Key
 read -p "请输入 flomo API URL (默认: $DEFAULT_API_URL): " API_URL
