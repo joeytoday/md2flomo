@@ -61,4 +61,5 @@
 - [x] 错误提示优化：API Token 失效、网络错误、内容为空 ✅ 2025-09-05
 
 ### 效果演示
-![blcok发布界面](https://joey-md-asset.oss-cn-hangzhou.aliyuncs.com/img/202509051453220.png)
+
+<img src="https://joey-md-asset.oss-cn-hangzhou.aliyuncs.com/img/202509051453220.png" style="zoom:30%;" />
